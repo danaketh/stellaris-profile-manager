@@ -1,0 +1,5 @@
+/.idea/
+/build/
+/dist/
+/profiles.db
+__pycache__
