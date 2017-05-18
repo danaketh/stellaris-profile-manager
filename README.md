@@ -2,6 +2,8 @@
 
 Profile manager for [Stellaris](http://store.steampowered.com/app/281990/) game to let you switch between different mods with ease.
 
+![Thumbnail of the SPM](screenshot.png)
+
 ## Prerequisites
 - Python 3.5+
 
