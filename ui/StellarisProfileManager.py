@@ -205,9 +205,8 @@ class StellarisProfilesManager(QMainWindow):
         Launch the game
         :return: 
         """
-        self.launchButton.setEnabled(False)
+        self.launchButton.setDisabled(True)
         profile_item = self.listOfProfiles.currentItem()
-        # command = list([self.steam_path.replace('/', '\\')])
         command = list([self.steam_path])
         command.append("-applaunch 281990")  # set the application ID
         command.append("-skiplauncher")  # we can skip the game launcher
@@ -216,7 +215,10 @@ class StellarisProfilesManager(QMainWindow):
 
         command = format(" ".join(command))
         print("Executing " + command)
-        return subprocess.Popen(command)
+        subprocess.Popen(command)
+
+        # I guess closing the app is easier than trying to check for the process and wait for it to end
+        self.close()
 
     def open_path_finder_dialog(self):
         """
