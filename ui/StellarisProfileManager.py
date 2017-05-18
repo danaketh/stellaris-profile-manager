@@ -71,6 +71,7 @@ class StellarisProfilesManager(QMainWindow):
         """
         self.listOfProfiles.setGeometry(20, 20, 350, 250)
         self.listOfProfiles.itemClicked.connect(self.enable_profile_buttons)
+        self.listOfProfiles.itemDoubleClicked.connect(self.launch_game)
         self.load_profiles()
 
     def create_launch_button(self):
