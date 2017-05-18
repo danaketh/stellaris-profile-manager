@@ -26,7 +26,14 @@ $ python run.py
 
 ## Build
 
-On Windows that is what we the the PyInstaller for. You'll need to have Python 3.5 installed to do that since 3.6 is not yet supported.
+On Windows that is what we the the PyInstaller for. You'll need to have Python 3.5 installed to do that since 3.6
+is not yet supported.
+
+```bash
+$ pyinstaller run.py --noconsole --onefile --paths <PATH_TO_QT5_DLLS>
+```
+
+Then, after the app is built for the first time, you can simply use the spec file to build it:
 
 ```bash
 $ pyinstaller run.spec
