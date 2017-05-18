@@ -5,11 +5,6 @@ import json
 from PyQt5.QtWidgets import QApplication
 from ui.StellarisProfileManager import StellarisProfilesManager
 
-game_root = os.path.expanduser('~\\Documents\\Paradox Interactive\\Stellaris')
-
-stellaris_settings_path = game_root
-stellaris_mods_path = os.path.join('\\', game_root, 'mod')
-
 
 class Database:
     """
@@ -55,6 +50,61 @@ class Database:
         self.cursor.execute("SELECT profile_name, is_active, is_default FROM profiles")
         return self.cursor.fetchall()
 
+    def get_profile(self, name):
+        """
+        
+        :param name: 
+        :return: 
+        """
+        self.cursor.execute("SELECT profile_name, mods FROM profiles WHERE profile_name=?", [name])
+        return self.cursor.fetchone()
+
+    def delete_profile(self, name):
+        """
+        
+        :param name: 
+        :return: 
+        """
+        self.cursor.execute("DELETE FROM profiles WHERE profile_name=?", [name])
+        return self.connection.commit()
+
+    def save_config(self, key, value):
+        self.cursor.execute(
+            "INSERT OR IGNORE INTO settings (`key`, `value`) VALUES (?, ?)",
+            (key, value)
+        )
+        self.connection.commit()
+        self.cursor.execute(
+            'UPDATE settings SET `value`=? WHERE `key`=?',
+            (value, key)
+        )
+        self.connection.commit()
+
+    def get_config(self, key):
+        self.cursor.execute("SELECT `value` FROM settings WHERE `key`=?", [key])
+        conf = self.cursor.fetchone()
+
+        if conf:
+            return conf[0]
+
+        return False
+
+    def get_mods(self, profile):
+        self.cursor.execute("SELECT profile_name, mods FROM profiles WHERE profile_name=?", [profile])
+        profile = self.cursor.fetchone()
+        return json.loads(profile[1])
+
+    def save_mods(self, profile, mods):
+        self.cursor.execute(
+            'INSERT OR IGNORE INTO profiles (profile_name, mods, is_active, is_default) VALUES (?, ?, ?, ?)',
+            [profile, json.dumps(mods), 0, 0]
+        )
+        self.connection.commit()
+        self.cursor.execute(
+            'UPDATE profiles SET mods=? WHERE profile_name=?',
+            (json.dumps(mods), profile)
+        )
+        self.connection.commit()
 
 db = Database('profiles.db')
 db.init()
