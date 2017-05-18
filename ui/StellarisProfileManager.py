@@ -131,7 +131,9 @@ class StellarisProfilesManager(QMainWindow):
         :return: 
         """
         self.pathToSteam.setGeometry(20, 352, 268, 28)
-        self.pathToSteam.setText(self.db.get_config('steam_path'))
+        path = self.db.get_config('steam_path')
+        if path:
+            self.pathToSteam.setText(path)
 
     def load_profiles(self):
         """
