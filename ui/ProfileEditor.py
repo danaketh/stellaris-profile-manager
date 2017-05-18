@@ -3,6 +3,7 @@ from PyQt5.Qt import Qt, QFont, QDesktopWidget, QSizePolicy
 import os
 from Paradox.Mod import Mod
 
+
 class ProfileEditor(QDialog):
     def __init__(self, app, profile=None):
         """
@@ -20,18 +21,10 @@ class ProfileEditor(QDialog):
         self.listOfMods = QListWidget(self)
         self.saveButton = QPushButton(self)
         self.cancelButton = QPushButton(self)
-        # self.reloadModsButton = QPushButton(self)
+        self.reloadModsButton = QPushButton(self)
 
         # initialize the UI
         self.init_ui()
-
-        """
-        if not profile:
-            self.add_mods()
-        else:
-            self.profileName.setText(profile[0])
-            self.add_mods(profile[1])
-        """
 
     def init_ui(self):
         """
@@ -59,6 +52,7 @@ class ProfileEditor(QDialog):
         self.create_list_of_mods()
         self.create_save_button()
         self.create_cancel_button()
+        self.create_reload_mods_button()
 
     def create_profile_name_input(self):
         """
@@ -100,12 +94,32 @@ class ProfileEditor(QDialog):
         self.cancelButton.setDefault(True)
         self.cancelButton.clicked.connect(self.on_cancel)
 
+    def create_reload_mods_button(self):
+        """
+        Configure the reload mods button
+        :return: 
+        """
+        self.reloadModsButton.setGeometry(20, 360, 80, 30)
+        self.reloadModsButton.setText('Reload mods')
+        self.reloadModsButton.clicked.connect(self.reload_mods)
+
+    def reload_mods(self):
+        """
+        Reload mods
+        :return: 
+        """
+        if self.profile:
+            self.load_mods(self.profile[1])
+        else:
+            self.load_mods()
+
     def load_mods(self, mods=[]):
         """
         Load mods into the list
         :param mods: 
         :return: 
         """
+        self.listOfMods.clear()
         for m in self.get_available_mods():
             item = QListWidgetItem()
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
