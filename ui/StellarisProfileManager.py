@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QPushButton, QLineEdit, QFileDialog
 from PyQt5.Qt import QFont, QDesktopWidget, QSizePolicy
 from .ProfileEditor import ProfileEditor
-import json
 import subprocess
+
 
 class StellarisProfilesManager(QMainWindow):
     """
@@ -29,6 +29,7 @@ class StellarisProfilesManager(QMainWindow):
 
         # initialize the UI
         self.init_ui()
+        self.reload_config()
 
         # show the main window
         self.show()
@@ -84,6 +85,7 @@ class StellarisProfilesManager(QMainWindow):
         font.setBold(True)
         font.setPixelSize(12)
         self.launchButton.setFont(font)
+        self.launchButton.clicked.connect(self.launch_game)
 
     def create_new_profile_button(self):
         """
@@ -182,6 +184,7 @@ class StellarisProfilesManager(QMainWindow):
         """
         profile_item = self.listOfProfiles.currentItem()
         self.db.delete_profile(profile_item.text())
+        self.load_profiles()
 
     def enable_profile_buttons(self):
         """
@@ -218,7 +221,7 @@ class StellarisProfilesManager(QMainWindow):
         Open dialog for finding and choosing Steam.exe
         :return: 
         """
-        file_name = QFileDialog.getOpenFileName(self, caption='Steam path', directory='C:\\', options=[])
+        file_name = QFileDialog.getOpenFileName(self, caption='Steam path', directory='C:\\')
 
         if file_name[0]:
             self.db.save_config('steam_path', file_name[0])
