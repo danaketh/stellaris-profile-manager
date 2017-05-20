@@ -62,6 +62,20 @@ class Database:
         self.cursor.execute("SELECT profile_name, mods FROM profiles WHERE profile_name=?", [name])
         return self.cursor.fetchone()
 
+    def profile_exists(self, name):
+        """
+
+        :param name: 
+        :return: 
+        """
+        self.cursor.execute("SELECT COUNT(*) FROM profiles WHERE profile_name=?", [name])
+        result = self.cursor.fetchone()
+
+        if result[0] > 0:
+            return True
+
+        return False
+
     def delete_profile(self, name):
         """
         
@@ -115,6 +129,7 @@ db.init()
 
 if not os.path.isdir('profiles'):
     os.mkdir('profiles')
+
 
 def main():
     """
