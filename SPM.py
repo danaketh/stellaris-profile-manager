@@ -113,6 +113,8 @@ class Database:
 db = Database('profiles.db')
 db.init()
 
+if not os.path.isdir('profiles'):
+    os.mkdir('profiles')
 
 def main():
     """
