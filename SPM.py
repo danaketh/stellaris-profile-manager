@@ -3,7 +3,10 @@ import sys
 import sqlite3
 import json
 from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtCore
 from ui.StellarisProfileManager import StellarisProfilesManager
+
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 
 
 class Database:
@@ -106,6 +109,7 @@ class Database:
         )
         self.connection.commit()
 
+
 db = Database('profiles.db')
 db.init()
 
@@ -116,10 +120,16 @@ def main():
     :return: 
     """
     app = QApplication(sys.argv)
+    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     SPM = StellarisProfilesManager(db)
     sys.exit(app.exec_())
 
 
 # Run Forrest, Run!
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        log = open('crash.log', 'a+')
+        log.write(str(e))
+        log.close()

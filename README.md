@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 
 Just have Python to run the script:
 ```bash
-$ python run.py
+$ python SPM.py
 ```
 
 ## Build
@@ -32,11 +32,11 @@ On Windows that is what we the the PyInstaller for. You'll need to have Python 3
 is not yet supported.
 
 ```bash
-$ pyinstaller run.py --noconsole --onefile --paths <PATH_TO_QT5_DLLS>
+$ pyinstaller SPM.py --noconsole --onefile --paths <PATH_TO_QT5_DLLS>
 ```
 
 Then, after the app is built for the first time, you can simply use the spec file to build it:
 
 ```bash
-$ pyinstaller run.spec
+$ pyinstaller SPM.spec
 ```
