@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QPushButton, QLineEdit, QFileDialog
 from PyQt5.Qt import QFont, QDesktopWidget, QSizePolicy
 from .ProfileEditor import ProfileEditor
+from .ImportDialog import ImportDialog
 import subprocess
 import unicodedata
 import re
@@ -215,7 +216,9 @@ class StellarisProfilesManager(QMainWindow):
         self.load_profiles()
 
     def import_profile_dialog(self):
-        print('import dialog')
+        dialog = ImportDialog(app=self)
+        dialog.exec_()
+        dialog.show()
 
     def export_profile(self):
         """
