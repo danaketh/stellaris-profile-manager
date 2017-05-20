@@ -1,4 +1,4 @@
-from pyparsing import *
+import re
 
 
 class Mod:
@@ -27,28 +27,10 @@ class Mod:
         """
         mod = {}
 
-        lbrack = Literal("{").suppress()
-        rbrack = Literal("}").suppress()
-        equals = Literal("=").suppress()
-
-        nonequals = "".join([c for c in printables if c != "="]) + " \t"
-
-        keydef = ~lbrack + Word(nonequals) + equals + restOfLine
-        arraydef = ~lbrack + Word(nonequals) + equals + lbrack + restOfLine + rbrack
-
-        conf = Dict(
-            ZeroOrMore(
-                Group(keydef),
-                Group(arraydef)
-            )
-        )
-
-        tokens = conf.parseString(data)
-        for t in tokens.asList():
-            val = t[1]
-            if val.startswith('"') and val.endswith('"'):
-                val = val[1:-1]
-
-            mod[t[0]] = val
+        try:
+            mod['name'] = re.search('^name[ \t]*=[ \t]*"(.*)"', data, re.MULTILINE).group(1)
+            mod['version'] = re.search('^supported_version[ \t]*=[ \t]*"(.*)"', data, re.MULTILINE).group(1)
+        except AttributeError as e:
+            raise ValueError("Could not find plugin name", data) from e
 
         return mod
