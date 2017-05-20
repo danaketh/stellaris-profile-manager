@@ -2,7 +2,9 @@ from PyQt5.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QPushButt
 from PyQt5.Qt import QFont, QDesktopWidget, QSizePolicy
 from .ProfileEditor import ProfileEditor
 import subprocess
-
+import unicodedata
+import re
+import json
 
 class StellarisProfilesManager(QMainWindow):
     """
@@ -26,6 +28,8 @@ class StellarisProfilesManager(QMainWindow):
         self.deleteProfileButton = QPushButton(self)
         self.findSteamButton = QPushButton(self)
         self.pathToSteam = QLineEdit(self)
+        self.importProfileButton = QPushButton(self)
+        self.exportProfileButton = QPushButton(self)
 
         # initialize the UI
         self.init_ui()
@@ -43,7 +47,7 @@ class StellarisProfilesManager(QMainWindow):
         desktop = QDesktopWidget()
         screen_width = desktop.screen().width()
         screen_height = desktop.screen().height()
-        app_width = 390
+        app_width = 505
         app_height = 400
         self.setWindowTitle('Stellaris Profile Manager')
         self.setGeometry(  # this centers the window
@@ -61,6 +65,8 @@ class StellarisProfilesManager(QMainWindow):
         self.create_new_profile_button()
         self.create_edit_profile_button()
         self.create_delete_profile_button()
+        self.create_import_profile_button()
+        self.create_export_profile_button()
         self.create_find_steam_button()
         self.create_path_to_steam_input()
 
@@ -93,7 +99,7 @@ class StellarisProfilesManager(QMainWindow):
         Configure the new profile button
         :return: 
         """
-        self.newProfileButton.setGeometry(19, 318, 115, 30)
+        self.newProfileButton.setGeometry(373, 19, 115, 30)
         self.newProfileButton.setText('New profile')
         self.newProfileButton.clicked.connect(self.open_empty_profile)
 
@@ -102,7 +108,7 @@ class StellarisProfilesManager(QMainWindow):
         Configure the edit profile button
         :return: 
         """
-        self.editProfileButton.setGeometry(137, 318, 116, 30)
+        self.editProfileButton.setGeometry(373, 53, 115, 30)
         self.editProfileButton.setText('Edit profile')
         self.editProfileButton.setDisabled(True)
         self.editProfileButton.clicked.connect(self.open_existing_profile)
@@ -112,10 +118,29 @@ class StellarisProfilesManager(QMainWindow):
         Configure the delete profile button
         :return: 
         """
-        self.deleteProfileButton.setGeometry(256, 318, 115, 30)
+        self.deleteProfileButton.setGeometry(373, 87, 115, 30)
         self.deleteProfileButton.setText('Delete profile')
         self.deleteProfileButton.setDisabled(True)
         self.deleteProfileButton.clicked.connect(self.delete_existing_profile)
+
+    def create_import_profile_button(self):
+        """
+        Configure the delete profile button
+        :return: 
+        """
+        self.importProfileButton.setGeometry(373, 131, 115, 30)
+        self.importProfileButton.setText('Import profile')
+        self.importProfileButton.clicked.connect(self.import_profile_dialog)
+
+    def create_export_profile_button(self):
+        """
+        Configure the delete profile button
+        :return: 
+        """
+        self.exportProfileButton.setGeometry(373, 165, 115, 30)
+        self.exportProfileButton.setText('Export profile')
+        self.exportProfileButton.setDisabled(True)
+        self.exportProfileButton.clicked.connect(self.export_profile)
 
     def create_find_steam_button(self):
         """
@@ -189,6 +214,23 @@ class StellarisProfilesManager(QMainWindow):
         self.db.delete_profile(profile_item.text())
         self.load_profiles()
 
+    def import_profile_dialog(self):
+        print('import dialog')
+
+    def export_profile(self):
+        """
+        Export profile to JSON
+        :return: 
+        """
+        profile_item = self.listOfProfiles.currentItem()
+        profile = self.db.get_profile(profile_item.text())
+        file_name = unicodedata.normalize('NFKD', profile[0]).encode('ascii', 'ignore')
+        file_name = re.sub('[^\w\s-]', '', file_name.decode('ascii')).strip().lower()
+        file_name = re.sub('[-\s]+', '-', file_name)
+        f = open('profiles/{}.json'.format(file_name), 'w')
+        f.write(json.dumps(profile))
+        f.close()
+
     def enable_profile_buttons(self):
         """
         Enable profile related buttons which are disabled because
@@ -197,6 +239,7 @@ class StellarisProfilesManager(QMainWindow):
         """
         self.editProfileButton.setEnabled(True)
         self.deleteProfileButton.setEnabled(True)
+        self.exportProfileButton.setEnabled(True)
 
         if self.steam_path:
             self.launchButton.setEnabled(True)
