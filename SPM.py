@@ -2,9 +2,13 @@ import os
 import sys
 import sqlite3
 import json
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QSplashScreen
 from PyQt5 import QtCore
+from PyQt5.QtGui import QPixmap
 from ui.StellarisProfileManager import StellarisProfilesManager
+from bs4 import BeautifulSoup
+import requests
+import re
 
 os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 
@@ -131,14 +135,47 @@ if not os.path.isdir('profiles'):
     os.mkdir('profiles')
 
 
+def get_game_version():
+    """
+    Get the current game version. This looks like the easiest way atm.
+    :return: 
+    """
+    page = requests.get("http://www.stellariswiki.com/index.php?title=Patches&mobileaction=toggle_view_mobile")
+    soup = BeautifulSoup(page.text, "html.parser")
+    table = soup.find("table", attrs={"class": "mildtable sortable"})
+    versions = []
+    builds = []
+    for row in table.find_all('tr')[1:]:
+        for td in row.find_all('td'):
+            text = td.get_text().strip()
+            version = re.search('^(\d)\.(\d)$', text)  # main releases
+            build = re.search('^(\d)\.(\d)\.(\d)$', text)  # builds
+            if version:
+                versions.append(version.group(0))
+            if build:
+                builds.append(build.group(0))
+
+    return {'release': max(versions), 'build': max(builds)}
+
+
 def main():
     """
     Main app loop
     :return: 
     """
     app = QApplication(sys.argv)
+    # splash screen
+    splash_img = QPixmap('splash.jpg')
+    splash = QSplashScreen(splash_img, QtCore.Qt.WindowStaysOnTopHint)
+    splash.setMask(splash_img.mask())
+    splash.show()
+    # do what we need to do
+    version = get_game_version()
+
+    # go forth with app
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-    SPM = StellarisProfilesManager(db)
+    SPM = StellarisProfilesManager(db=db, game_version=version)
+    splash.finish(SPM)
     sys.exit(app.exec_())
 
 
@@ -147,6 +184,7 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        log = open('crash.log', 'a+')
+        log = open('crash.log', 'w')
+        print(e)
         log.write(str(e))
         log.close()
