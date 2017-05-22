@@ -135,6 +135,17 @@ if not os.path.isdir('profiles'):
     os.mkdir('profiles')
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 def get_game_version():
     """
     Get the current game version. This looks like the easiest way atm.
@@ -165,7 +176,8 @@ def main():
     """
     app = QApplication(sys.argv)
     # splash screen
-    splash_img = QPixmap('splash.jpg')
+    img_path = resource_path('splash.jpg')
+    splash_img = QPixmap(img_path)
     splash = QSplashScreen(splash_img, QtCore.Qt.WindowStaysOnTopHint)
     splash.setMask(splash_img.mask())
     splash.show()
