@@ -3,6 +3,7 @@
 #
 ###### Requirements without Version Specifiers ######
 PyQt5
-pyparsing
+bs4
 pyinstaller
+requests
 #
