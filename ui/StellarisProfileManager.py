@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QPushButton, QLineEdit, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QPushButton, QLineEdit, QFileDialog, QLabel
 from PyQt5.Qt import QFont, QDesktopWidget, QSizePolicy
 from .ProfileEditor import ProfileEditor
 from .ImportDialog import ImportDialog
@@ -7,17 +7,19 @@ import unicodedata
 import re
 import json
 
+
 class StellarisProfilesManager(QMainWindow):
     """
     Main application window
     """
 
-    def __init__(self, db):
+    def __init__(self, db, game_version):
         """
         Initialize the class
         """
         self.db = db
         self.steam_path = None
+        self.game_version = game_version
 
         super(StellarisProfilesManager, self).__init__()
 
@@ -31,6 +33,7 @@ class StellarisProfilesManager(QMainWindow):
         self.pathToSteam = QLineEdit(self)
         self.importProfileButton = QPushButton(self)
         self.exportProfileButton = QPushButton(self)
+        self.gameVersion = QLabel(self)
 
         # initialize the UI
         self.init_ui()
@@ -70,6 +73,7 @@ class StellarisProfilesManager(QMainWindow):
         self.create_export_profile_button()
         self.create_find_steam_button()
         self.create_path_to_steam_input()
+        self.create_game_version()
 
     def create_list_of_profiles(self):
         """
@@ -148,7 +152,7 @@ class StellarisProfilesManager(QMainWindow):
         Configure the button for finding the Steam installation
         :return: 
         """
-        self.findSteamButton.setGeometry(291, 351, 80, 30)
+        self.findSteamButton.setGeometry(291, 319, 80, 30)
         self.findSteamButton.setText('Find Steam')
         self.findSteamButton.clicked.connect(self.open_path_finder_dialog)
 
@@ -157,10 +161,15 @@ class StellarisProfilesManager(QMainWindow):
         Configure the input which holds the Steam path
         :return: 
         """
-        self.pathToSteam.setGeometry(20, 352, 268, 28)
+        self.pathToSteam.setGeometry(20, 320, 268, 28)
         path = self.db.get_config('steam_path')
         if path:
             self.pathToSteam.setText(path)
+
+    def create_game_version(self):
+        self.gameVersion.setGeometry(20, 360, 268, 28)
+        self.gameVersion.setText(
+            'Game version: {} | Game build: {}'.format(self.game_version['release'], self.game_version['build']))
 
     def load_profiles(self):
         """
