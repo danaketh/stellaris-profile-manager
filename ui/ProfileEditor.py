@@ -1,10 +1,15 @@
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QLineEdit, QListWidget, QPushButton
-from PyQt5.Qt import Qt, QFont, QDesktopWidget, QSizePolicy
+from PyQt5.Qt import Qt, QDesktopWidget, QSizePolicy
+from PyQt5.QtGui import QColor
 import os
 from Paradox.Mod import Mod
 
 
 class ProfileEditor(QDialog):
+    """
+    Profile editor
+    """
+
     def __init__(self, app, profile=None):
         """
         Init
@@ -123,12 +128,19 @@ class ProfileEditor(QDialog):
         for m in self.get_available_mods():
             item = QListWidgetItem()
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            # set used mods as active
             if m['path'] in mods:
                 item.setCheckState(Qt.Checked)
             else:
                 item.setCheckState(Qt.Unchecked)
+
             item.setText(m['name'])
             item.setData(Qt.UserRole, m['path'])
+            # set background for the outdated mods
+            if not m['version'].startswith(self.app.game_version['release']):
+                item.setText('{} *OUTDATED*'.format(item.text()))
+                item.setBackground(QColor('red'))
+
             self.listOfMods.addItem(item)
 
         self.listOfMods.sortItems(Qt.AscendingOrder)
